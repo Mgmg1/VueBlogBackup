@@ -1,0 +1,74 @@
+#server:
+#  ssl:
+#    key-store: 5246346_www.winkblog.cn.pfx
+#    key-store-password: rU413h2F
+#    enabled: true
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+#   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,log4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 15MB
+  mail:
+    host: smtp.qq.com
+    username: 3147728559@qq.com
+    password: ngfhcfnvjowkdeha
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          port: 465
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: true
+          socketFactory:
+            classl: javax.net.ssl.SSLSocketFactory
+        transport:
+          protocol: smtp
+  profiles:
+    active: dev
+mybatis:
+  type-aliases-package: com.whz.blog.entity
+  mapper-locations: classpath:mybatis/*.xml
+
+---
+spring:
+  profiles: dev
+  datasource:
+    username: root
+    password: 123456
+server:
+  port: 9999
+
+---
+
+spring:
+  profiles: prd
+  datasource:
+    username: root
+    password: WHZNewPass4!
+server:
+  port: 443

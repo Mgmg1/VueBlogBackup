@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whz.blog.mapper.ArticleMapper">
+
+    <resultMap id="articleMapping" type="Article">
+        <id property="articleId" column="article_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="content" column="content" javaType="[B"/>
+        <result property="coverUrl" column="cover_url"/>
+        <result property="noteType" column="note_type"/>
+        <result property="title" column="title"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="summary" column="summary"/>
+        <result property="categoryName" column="category_name"/>
+    </resultMap>
+
+    <select id="queryInfosByNoteType" resultMap="articleMapping" >
+            select
+            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
+            from article
+            where
+            user_id = #{userId} and note_type = #{noteType}
+    </select>
+
+    <select id="queryInfosByCategoryName" resultMap="articleMapping" >
+            select
+            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
+            from article
+            where
+            user_id = #{userId} and category_name = #{categoryName}
+    </select>
+
+
+    <select id="queryInfosByTagName" resultMap="articleMapping" parameterType="Tag">
+            select
+            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
+            from article
+            where article_id in (
+                select
+                article_id
+                from tag
+                where user_id = #{userId} and tag_name = #{tagName}
+            )
+    </select>
+
+
+    <select id="queryCountForEachNoteType" resultType="HashMap">
+        select note_type as noteType , COUNT(article_id) as noteTypeCount
+        from  article
+        where user_id = #{userId}
+        group by note_type
+    </select>
+
+    <select id="queryCategoryInfos" resultType="HashMap">
+        select category_name as categoryName,COUNT(article_id) as categoryCount
+        from article
+        where user_id = #{userId}
+        group by category_name
+    </select>
+
+    <insert id="addArticle"
+            parameterType="Article"
+            useGeneratedKeys="true"
+            keyColumn="article_id" keyProperty="articleId">
+        insert into article (
+           content,user_id,note_type,cover_url,title,create_date,summary,category_name
+        ) value (
+            #{content,jdbcType=BLOB},
+            #{userId},
+            #{noteType,javaType=Integer},
+            #{coverUrl},
+            #{title},
+            #{createDate},
+            #{summary},
+            #{categoryName}
+        )
+    </insert>
+
+    <select id="queryByUserId" resultMap="articleMapping" parameterType="int">
+        select *
+        from article
+        where user_id = #{userId}
+    </select>
+
+
+    <select id="queryAllInfosByUserId" resultMap="articleMapping" parameterType="int">
+        select
+            article_id,
+            user_id,
+            cover_url,
+            note_type,
+            title,
+            create_date,
+            summary,
+            category_name
+        from article
+        where user_id = #{userId}
+    </select>
+
+    <select id="queryByArticleId" resultMap="articleMapping" parameterType="int">
+        select *
+        from article
+        where article_id = #{articleId}
+    </select>
+
+    <select id="queryByTag" resultMap="articleMapping" parameterType="list">
+        select *
+        from article
+        <where>
+            <if test="list!=null and list.size>0">
+                <foreach collection="list" open="and article_id in (" close=")" separator=",">
+                    #{articleId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

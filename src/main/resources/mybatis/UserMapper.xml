@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whz.blog.mapper.UserMapper">
+
+    <resultMap id="userMapping" type="User">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="headImgUrl" column="head_img_url"/>
+        <result property="announcement" column="announcement"/>
+        <result property="githubUrl" column="github_url"/>
+        <result property="bilibiliUrl" column="bilibili_url"/>
+    </resultMap>
+
+    <select id="queryByUserName" resultMap="userMapping">
+        select
+            *
+        from  user
+        where
+        username = #{userName}
+    </select>
+
+    <select id="queryByEmail" resultMap="userMapping">
+        select
+            *
+        from  user
+        where
+        email = #{email}
+    </select>
+
+
+    <select id="queryByNameOrEmail" resultMap="userMapping" >
+        select
+            user_id,
+            username,
+            password,
+            email,
+            head_img_url,
+            announcement
+            github_url,
+            bilibili_url
+        from user
+        where username = #{userName}
+        or email = #{email}
+    </select>
+
+    <select id="queryByUserId" resultMap="userMapping">
+        select
+            user_id,
+            username,
+            email,
+            head_img_url,
+            announcement,
+            github_url,
+            bilibili_url
+        from user
+        where user_id = #{userId}
+    </select>
+
+    <insert id="addUser" parameterType="User">
+        insert into user (
+            username,password,email
+        )value (
+            #{userName}, #{password}, #{email}
+        )
+    </insert>
+
+    <update id="updateHeadImgUrl" >
+        update user
+        set
+            head_img_url  = #{headImgUrl}
+        where
+        user_id = #{userId}
+    </update>
+
+    <update id="updateAnnouncement">
+        update user
+        set
+            announcement  = #{announcement}
+        where
+        user_id = #{userId}
+    </update>
+
+    <update id="updateBiliGithubUrl" >
+        update user
+        set
+            github_url = #{ githubUrl },
+            bilibili_url =#{ bilibiliUrl }
+        where
+        user_id = #{userId}
+    </update>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whz.blog.mapper.ConfigMapper">
+
+    <resultMap id="configMapping" type="HashMap">
+        <result property="props" column="props"/>
+        <result property="value" column="props_value"/>
+    </resultMap>
+
+    <select id="queryPropsValue" resultType="String">
+        select
+            props_value
+        from config
+        where
+            props = #{propsName}
+    </select>
+
+</mapper>
