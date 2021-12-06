@@ -36,7 +36,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(getAccessOriginInterceptor())
                 .addPathPatterns("/**");
         registry.addInterceptor(getSignInterceptor())
-                .addPathPatterns("/**");
+                .addPathPatterns("/**").excludePathPatterns("/download");
         registry.addInterceptor(getAuthInterceptor())
                 .addPathPatterns("/upload","/setheadimgurl","/setannon");
 

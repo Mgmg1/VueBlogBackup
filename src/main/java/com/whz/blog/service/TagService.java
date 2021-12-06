@@ -12,4 +12,6 @@ public interface TagService {
     Integer addTag(List<Tag> tagList);
 
     List<Tag> queryTagsByArticleId(Integer articleId);
+
+    Integer deleteTagsByArticleId(int articleId);
 }

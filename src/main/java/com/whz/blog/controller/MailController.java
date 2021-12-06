@@ -37,6 +37,9 @@ public class MailController {
     @Value("${spring.mail.username}")
     private String from;
 
+    /*
+        根据向邮件帐号发送邮件
+     */
     @PostMapping("/mail")
     public Object sendMineMail(
             @RequestParam("email") @Email String email,
@@ -56,8 +59,7 @@ public class MailController {
         String veriCode = stringBuilder.toString();
 
         helper.setText("   <p><img src='cid:image'/></p><h3>验证码:"+veriCode+"</h3> ",true);
-        //addInLine必须在setText前，否则图片无法显示！！！
-//        helper.addInline("image",new FileSystemResource(this.getClass().getResource("/static/1.jpg").getPath()));
+        //setText必须在addInLine前，否则图片无法显示！！！
         // jar包中文件不存在于真实的路径中，通过Resource的方式获取.而不是 File
         PathMatchingResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
         Resource resource = patternResolver.getResource("classpath:/static/1.jpg");

@@ -46,4 +46,10 @@
         </if>
     </insert>
 
+    <delete id="deleteTagsByArticleId" parameterType="int">
+        delete
+        from tag
+        where article_id = #{articleId};
+    </delete>
+
 </mapper>

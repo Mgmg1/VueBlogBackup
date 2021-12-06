@@ -1,8 +1,3 @@
-#server:
-#  ssl:
-#    key-store: 5246346_www.winkblog.cn.pfx
-#    key-store-password: rU413h2F
-#    enabled: true
 
 spring:
   datasource:

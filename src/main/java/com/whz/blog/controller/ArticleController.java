@@ -9,10 +9,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +32,9 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
-
+    /*
+        上传文章
+     */
     @PostMapping("/upload")
     public Object uploadMd(
             @Valid Article article,
@@ -36,7 +42,6 @@ public class ArticleController {
             @RequestParam(value = "tags",required = true) String[] tags){
         Result result = new Result();
         result.setCode(200);
-//        DataSize.ofMegabytes(50)
 
         if (file.isEmpty() || file.getSize() > 3 * 1024 * 2014) {
             result.setMessage("文件为空或过大");
@@ -63,6 +68,9 @@ public class ArticleController {
         return result;
     }
 
+    /*
+        根据articleId查找博客
+     */
     @GetMapping("/blogcontent")
     public Object getArticleWithId(
             @RequestParam(value = "articleid",required = true) @NotNull Integer articleId
@@ -84,6 +92,9 @@ public class ArticleController {
         return result;
     }
 
+    /*
+        根据userId查询博客的数量信息
+     */
     @GetMapping("/blogcount")
     public Object getBlogsInfo(
             @RequestParam(value = "uid",required = true) @NotNull Integer userId
@@ -102,6 +113,9 @@ public class ArticleController {
         return result;
     }
 
+    /*
+        根据所给的 type 查询文章信息
+     */
     @GetMapping("/bloginfos")
     public Object getBlogsInfoList(
             @RequestParam(value = "type",required = true) @NotNull String type,
@@ -130,5 +144,80 @@ public class ArticleController {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /*
+        根据 articleId提供blog文件
+     */
+    @GetMapping("/download")
+    public Result downloadBlogContentByArticleId(
+            @RequestParam(value = "articleid",required = true) Integer articleId,
+            HttpServletResponse response
+    ) {
+        Result result = new Result();
+        result.setMessage("ok");
+        result.setCode(200);
+        ServletOutputStream outputStream = null;
+        try {
+            //获取页面输出流
+            //读取文件
+            Article article = articleService.queryByArticleId(articleId);
+
+            if( article == null ) {
+                return result;
+            }
+
+
+            String fileName = article.getTitle() + " " + article.getCreateDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString() + ".md";
+            byte[] bytes = (byte[]) article.getContent();
+            //向输出流写文件
+            //写之前设置响应流以附件的形式打开返回值,这样可以保证前边打开文件出错时异常可以返回给前台
+            outputStream = response.getOutputStream();
+            response.setContentType("application/octet-stream; charset=utf-8");
+            response.setHeader("Content-Disposition","attachment;filename="+fileName);
+            outputStream.write(bytes);
+            outputStream.flush();
+            outputStream.close();
+            return result;
+        } catch (IOException e) {
+            result.setMessage("下载发生异常");
+            result.setCode(500);
+            return result;
+        } finally {
+            if( outputStream != null ) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /*
+        根据articleId删除文章Id
+        只能让拥有该article的用户删除
+     */
+    @PostMapping("/deletearticle")
+    public Result deleteArticleByArticleId(
+            @RequestParam(value = "aid",required = true) Integer articleId,
+            @RequestParam(value = "uid",required = true) Integer userId
+    ) {
+        Result result = new Result();
+        result.setCode( 500 );
+        result.setMessage("发生了未知的错误");
+
+        try {
+            int integer = articleService.deleteArticleByArticleId(articleId,userId);
+            if( integer == 0 ) {
+                return result;
+            }
+            result.setCode(200);
+            result.setMessage("OK");
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return result;
+        }
     }
 }

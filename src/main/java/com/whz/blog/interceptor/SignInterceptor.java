@@ -14,6 +14,10 @@ import java.util.Map;
 @Component
 public class SignInterceptor implements HandlerInterceptor {
 
+    /*
+        对前端的参数中的数字签名进行验证。
+        数字签名由前端生成
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(!(handler instanceof HandlerMethod) ){

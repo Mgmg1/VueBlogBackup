@@ -12,4 +12,6 @@ public interface TagMapper {
     Integer addTag(List<Tag> tagList);
 
     List<Tag> queryByArticleId(Integer articleId);
+
+    Integer deleteTagsByArticleId(int articleId);
 }

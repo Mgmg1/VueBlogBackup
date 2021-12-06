@@ -16,6 +16,11 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtil jwtUtil;
 
+    /*
+        认证拦截器。
+        只有登录了才能通过。
+        提取请求头中的 Authorization 和 fid。
+     */
     @Override
     public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler){
         String token = request.getHeader("Authorization");

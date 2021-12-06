@@ -86,6 +86,7 @@ public class Md5Utils {
                     paramsStr.add(key1);
                 }
             }
+            //参数从小到大排序
             Collections.sort(paramsStr);
             StringBuilder sbff = new StringBuilder();
             for (String kk : paramsStr) {

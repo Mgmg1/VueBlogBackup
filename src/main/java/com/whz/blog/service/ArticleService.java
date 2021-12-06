@@ -2,6 +2,7 @@ package com.whz.blog.service;
 
 import com.whz.blog.entity.Article;
 import com.whz.blog.entity.Tag;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -25,4 +26,6 @@ public interface ArticleService {
     Map<String,Object> queryBlogInfos(Integer userId);
 
     List<Article> queryAllInfosByUserId(Integer userId);
+
+    Integer deleteArticleByArticleId(int articleId, int userId);
 }

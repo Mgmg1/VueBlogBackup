@@ -114,4 +114,10 @@
             </if>
         </where>
     </select>
+
+    <delete id="deleteArticleByArticleId" >
+        delete
+        from article
+        where article_id = #{articleId} and user_id = #{userId}
+    </delete>
 </mapper>

@@ -35,5 +35,10 @@ public class TagServiceImpl implements TagService {
         return tagMapper.queryByArticleId( articleId );
     }
 
+    @Override
+    public Integer deleteTagsByArticleId(int articleId) {
+        return tagMapper.deleteTagsByArticleId( articleId );
+    }
+
 
 }

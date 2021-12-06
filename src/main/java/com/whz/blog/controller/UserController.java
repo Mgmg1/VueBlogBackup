@@ -43,6 +43,9 @@ public class UserController {
     @Autowired
     JwtUtil jwtUtil;
 
+    /*
+        登录
+     */
     @PostMapping("/login")
     public Object login(
             @RequestHeader(value = "fid",required = true) String fingerPrintId,
@@ -69,6 +72,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        注册
+     */
     @PostMapping("/register")
     public Object register(
             @RequestParam(value = "vericode",required = true)String code ,
@@ -117,6 +123,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        自动登录逻辑
+     */
     @PostMapping("/autologin")
     public Object autoLogin(
             @RequestHeader(value = "Authorization",required = true) String authToken,
@@ -124,6 +133,10 @@ public class UserController {
             @RequestParam(value = "isAutoLogin",required = true) Boolean isAutoLogin,
             HttpSession session){
 
+        /*
+            先判断session是否存在user，不存在则
+            再判断jwt是否有效
+         */
         Result result = new Result();
         result.setCode(200);
 
@@ -156,6 +169,10 @@ public class UserController {
     }
 
 
+    /*
+        登出,销毁session
+        前端会同时取消自动登录
+     */
     @RequestMapping("/logout")
     public Object logout(HttpSession session){
 
@@ -170,6 +187,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        根据uid查询用户信息
+     */
     @GetMapping("/userInfo")
     public Object queryUserInfoByUserId(
             @RequestParam(value = "uid",required = true) Integer userId
@@ -190,6 +210,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        设置博客封面图片的url
+     */
     @PostMapping("/setheadimgurl")
     public Object updateHeadImgUrl(
             @RequestParam(value = "uid",required = true) Integer userId,
@@ -212,6 +235,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        设置公共
+     */
     @PostMapping("/setannon")
     public Object updateAnnouncement(
             @RequestParam(value = "uid",required = true) Integer userId,
@@ -234,6 +260,9 @@ public class UserController {
         return result;
     }
 
+    /*
+        设置github的url
+     */
     @PostMapping("/setgburl")
     public Object updateBiliGithubUrl(
             @RequestParam(value = "uid",required = true) Integer userId,

@@ -14,6 +14,9 @@ public class ConfigController {
     @Autowired
     ConfigService configService;
 
+    /*
+        查询默认主页展示的用户的userId。
+     */
     @GetMapping("/defaultuid")
     public Object getDefaultUserId(){
 

@@ -26,4 +26,6 @@ public interface ArticleMapper {
     List<Article> queryInfosByNoteType(Integer userId, String noteType);
 
     List<Article> queryAllInfosByUserId(Integer userId);
+
+    Integer deleteArticleByArticleId(int articleId,int userId);
 }

@@ -7,6 +7,7 @@ import com.whz.blog.service.ArticleService;
 import com.whz.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @Date 2021/2/10 21:20
  */
 @Service
+@Transactional
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
@@ -102,6 +104,14 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> queryAllInfosByUserId(Integer userId) {
         return articleMapper.queryAllInfosByUserId(userId);
+    }
+
+    @Override
+    public Integer deleteArticleByArticleId(int articleId,int userId) {
+
+        tagService.deleteTagsByArticleId(articleId ); //存在外键时，必须先删除外键关联的记录，再删除实体
+        return articleMapper.deleteArticleByArticleId(articleId,userId);
+        //当删除后返回的受影响的行数为0时，说明发生了未知的错误。
     }
 
 }

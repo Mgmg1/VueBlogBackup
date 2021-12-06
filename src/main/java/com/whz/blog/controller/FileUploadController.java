@@ -17,6 +17,9 @@ import java.io.*;
 @RestController
 public class FileUploadController {
 
+    /*
+
+     */
     @PostMapping("/SingleFile/upload")
     public Object SingleFileUpLoad(@RequestParam("myfile") MultipartFile file ) {
         //判断文件是否为空

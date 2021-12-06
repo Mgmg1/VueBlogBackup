@@ -16,6 +16,9 @@ public class TagController {
     @Autowired
     TagService tagService;
 
+    /*
+        根据博客id查询对应的 tag
+     */
     @GetMapping("/tags")
     public Object queryTagsByArticleId(
             @RequestParam(value = "articleId",required = true) Integer articleId
