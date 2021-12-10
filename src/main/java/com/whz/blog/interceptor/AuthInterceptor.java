@@ -1,6 +1,9 @@
 package com.whz.blog.interceptor;
 
+import com.auth0.jwt.JWTVerifier;
+import com.whz.blog.controller.UserController;
 import com.whz.blog.entity.User;
+import com.whz.blog.mapper.UserMapper;
 import com.whz.blog.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,29 +22,9 @@ public class AuthInterceptor implements HandlerInterceptor {
     /*
         认证拦截器。
         只有登录了才能通过。
-        提取请求头中的 Authorization 和 fid。
      */
     @Override
     public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler){
-        String token = request.getHeader("Authorization");
-        String fingerPrintId = request.getHeader("fid");
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
-
-        if (token == null || fingerPrintId == null){
-            //token为空，进行业务处理
-            return false;
-        }
-
-        if (!jwtUtil.verify(token,fingerPrintId)) {
-            //token检验失败，如果在创建token时加上过期时间，时间过期了这里就是校验失败
-            return false;
-        }
-
-        Integer userId = jwtUtil.getUserId(token);
-        User user = (User) request.getSession().getAttribute("user");
-        return user != null && userId.equals(user.getUserId());
-
+        return request.getSession().getAttribute(UserController.USER ) != null ;
     }
 }

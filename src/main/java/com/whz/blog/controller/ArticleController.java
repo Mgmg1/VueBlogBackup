@@ -173,7 +173,6 @@ public class ArticleController {
             //向输出流写文件
             //写之前设置响应流以附件的形式打开返回值,这样可以保证前边打开文件出错时异常可以返回给前台
             outputStream = response.getOutputStream();
-            response.setContentType("application/octet-stream; charset=utf-8");
             response.setHeader("Content-Disposition","attachment;filename="+fileName);
             outputStream.write(bytes);
             outputStream.flush();

@@ -1,7 +1,5 @@
 package com.whz.blog.controller;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.whz.blog.BlogApplication;
 import com.whz.blog.entity.Result;
 import com.whz.blog.entity.User;
 
@@ -9,24 +7,14 @@ import com.whz.blog.service.UserService;
 import com.whz.blog.util.JwtUtil;
 import com.whz.blog.util.Md5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.CustomEditorConfigurer;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.expression.spel.ast.BooleanLiteral;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * @Description TODO
@@ -39,17 +27,19 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    JwtUtil jwtUtil;
+    public static final String AUTO_LOGIN = "AUTO_LOGIN";
+    public static final String USER = "user";
 
     /*
         登录
+        isAutoLogin = 1 时则 记录为自动登录
+        否则不是
      */
     @PostMapping("/login")
     public Object login(
-            @RequestHeader(value = "fid",required = true) String fingerPrintId,
             User user,
+            @RequestParam(value = "isAutoLogin",required = true)  Boolean isAutoLogin,
+            HttpServletRequest request,
             HttpSession session){
 
         Result result = new Result();
@@ -60,12 +50,15 @@ public class UserController {
             result.setData(false);
             return result;
         }
-
-        session.setAttribute("user",dbUser);
         result.setCode(200);
         result.setMessage("登录成功");
+        session.setAttribute(UserController.USER,dbUser);
+
         Map<String, Object> map = new HashMap<>();
-        String token = jwtUtil.create(dbUser.getUserId(),fingerPrintId);
+        String[] signs = new String[]{ request.getRemoteAddr() };//jwt由ip地址确认
+
+        String key = JwtUtil.appendKey( signs ) ;
+        String token = JwtUtil.create(dbUser.getUserId(),key,isAutoLogin);
         map.put("token",token);
         map.put("user",dbUser);
         result.setData(map);
@@ -125,45 +118,51 @@ public class UserController {
 
     /*
         自动登录逻辑
+        关于自动登录：
+        1 : 自动登录，
+       其它 : 否
      */
     @PostMapping("/autologin")
     public Object autoLogin(
             @RequestHeader(value = "Authorization",required = true) String authToken,
-            @RequestHeader(value = "fid",required = true) String fingerPrintId,
-            @RequestParam(value = "isAutoLogin",required = true) Boolean isAutoLogin,
+            HttpServletRequest request,
             HttpSession session){
-
         /*
             先判断session是否存在user，不存在则
             再判断jwt是否有效
          */
         Result result = new Result();
         result.setCode(200);
+        Map<String, Object> map = new HashMap<>();
 
-        Integer userId;
-        User user = (User) session.getAttribute("user");
-
-        if(user!=null){
-            userId = user.getUserId();
-        }else if ( !isAutoLogin || !jwtUtil.verify(authToken,fingerPrintId)) {
-            //token检验失败，如果在创建token时加上过期时间，时间过期了这里就是校验失败
+        User user = (User) session.getAttribute(UserController.USER);
+        if( user != null ) { //session找到了用户，说明在短期内未点击登出！！
+            result.setMessage("OK");
+            result.setData( map );
+            map.put(UserController.USER,user);
             return result;
-        }else {
-            userId = jwtUtil.getUserId(authToken);
         }
 
-        User dbUser = userService.queryByUserId(userId);
-        if(dbUser == null){
+        int userId;
+        String[] signs = new String[]{request.getRemoteAddr()};
+        if ( !JwtUtil.verify(authToken,JwtUtil.appendKey( signs ))) {
+            //token检验失败，如果在创建token时加上过期时间，时间过期了这里就是校验失败
+            result.setMessage("verification error");
+            return result;
+        }
+        if( !JwtUtil.getIsAutoLogin(authToken) ) {
+            return result;
+        }
+
+        userId = JwtUtil.getUserId(authToken);
+
+        user = userService.queryByUserId(userId);
+        if(user == null){
             result.setMessage("找不到该用户");
             return result;
         }
-
-        session.setAttribute("user",dbUser);
-
-        Map<String, Object> map = new HashMap<>();
-        String token = jwtUtil.create(dbUser.getUserId(),fingerPrintId);
-        map.put("token",token);
-        map.put("user",dbUser);
+        session.setAttribute( UserController.USER,user );
+        map.put(UserController.USER,user);
         result.setData(map);
         return result;
     }

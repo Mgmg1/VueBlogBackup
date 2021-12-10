@@ -36,12 +36,13 @@ public class SignInterceptor implements HandlerInterceptor {
 
         String signatures = Md5Utils.signatures(param);  //sign_server
         String sign = request.getParameter("sign");  //sign_client
-        if(sign == null || !sign.equalsIgnoreCase(signatures)){
-//            response.setContentType("text/json;charset=UTF-8");
-//            response.getWriter().write(JSON.toJSONString(new JsonResult(501,"签名校验失败","不好意思咯")));
-            return false;
+
+        if ( sign == null && param.isEmpty()  ) {
+            return true;
         }
-        return true;
+        return sign != null && sign.equalsIgnoreCase(signatures);
+
+
     }
 
 

@@ -1,10 +1,7 @@
 package com.whz.blog.util;
 
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Md5Utils {
 
@@ -106,6 +103,6 @@ public class Md5Utils {
     }
 
     public static void main(String[] args) {
-        System.out.println(getMD5("c1415238952",1));
+        String signatures = signatures(new HashMap<>());
     }
 }
