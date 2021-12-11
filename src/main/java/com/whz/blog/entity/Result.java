@@ -1,5 +1,8 @@
 package com.whz.blog.entity;
 
+import javafx.beans.binding.ObjectExpression;
+import org.springframework.http.HttpStatus;
+
 /**
  * @Description TODO
  * @Author WHZ
@@ -9,19 +12,26 @@ public class Result {
 
     //404 400 500
     private Integer code;
-
     private String message;
-
     private Object data;
-
     public Result(){
-        this.code = 404;
-        this.message = "发生未知的错误";
+        this.code = 500;
+        this.message = "catch unexpected errors";
     }
-
+    public Result(int code, String message) {
+        this(code,message,null);
+    }
     public Result(Integer code, String message, Object data) {
         this.code = code;
         this.message = message;
+        this.data = data;
+    }
+    public Result(HttpStatus httpStatus) {
+        this(httpStatus,null);
+    }
+    public Result(Object data,HttpStatus httpStatus) {
+        this.message = httpStatus.getReasonPhrase();
+        this.code = httpStatus.value();
         this.data = data;
     }
 

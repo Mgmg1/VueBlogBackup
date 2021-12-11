@@ -3,6 +3,7 @@ package com.whz.blog.controller;
 import com.whz.blog.entity.Result;
 import com.whz.blog.entity.User;
 
+import com.whz.blog.interceptor.AccessLimit;
 import com.whz.blog.service.UserService;
 import com.whz.blog.util.JwtUtil;
 import com.whz.blog.util.Md5Utils;
@@ -35,6 +36,7 @@ public class UserController {
         isAutoLogin = 1 时则 记录为自动登录
         否则不是
      */
+    @AccessLimit(limitCount = 2,second = 4)
     @PostMapping("/login")
     public Object login(
             User user,
@@ -68,6 +70,7 @@ public class UserController {
     /*
         注册
      */
+    @AccessLimit(limitCount = 2,second = 10)
     @PostMapping("/register")
     public Object register(
             @RequestParam(value = "vericode",required = true)String code ,
@@ -212,6 +215,7 @@ public class UserController {
     /*
         设置博客封面图片的url
      */
+    @AccessLimit(needLogin = true)
     @PostMapping("/setheadimgurl")
     public Object updateHeadImgUrl(
             @RequestParam(value = "uid",required = true) Integer userId,
@@ -237,6 +241,7 @@ public class UserController {
     /*
         设置公共
      */
+    @AccessLimit(needLogin = true)
     @PostMapping("/setannon")
     public Object updateAnnouncement(
             @RequestParam(value = "uid",required = true) Integer userId,

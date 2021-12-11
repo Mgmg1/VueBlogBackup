@@ -31,10 +31,8 @@ public class FileUploadController {
             result.setMessage("文件为空!!");
             return result;
         }
-
         return result;
-
-
+        
 //        //创建输入输出流
 //        OutputStream outputStream = null;
 //

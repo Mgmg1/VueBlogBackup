@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  * @Date 2021/2/10 21:20
  */
 @Service
-@Transactional
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired

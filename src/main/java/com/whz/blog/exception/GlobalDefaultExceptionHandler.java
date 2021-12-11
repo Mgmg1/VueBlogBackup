@@ -1,4 +1,4 @@
-package com.whz.blog.error;
+package com.whz.blog.exception;
 
 import com.whz.blog.entity.Result;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,10 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.util.Set;
 
-@RestControllerAdvice
+/**
+ *旧的全局异常处理器，处理范围很有限，并且由于没有监控所有异常，还必须依赖 controller层的 try catch 兜底
+ */
+@Deprecated
 public class GlobalDefaultExceptionHandler {
 
     @ExceptionHandler({ValidationException.class, BindException.class})

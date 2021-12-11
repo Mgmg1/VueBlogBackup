@@ -2,6 +2,7 @@ package com.whz.blog.controller;
 
 import com.whz.blog.entity.Article;
 import com.whz.blog.entity.Result;
+import com.whz.blog.interceptor.AccessLimit;
 import com.whz.blog.service.ArticleService;
 import com.whz.blog.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class ArticleController {
     /*
         上传文章
      */
+    @AccessLimit(needLogin = true)
     @PostMapping("/upload")
     public Object uploadMd(
             @Valid Article article,
@@ -116,6 +118,7 @@ public class ArticleController {
     /*
         根据所给的 type 查询文章信息
      */
+    @AccessLimit(second = 3)
     @GetMapping("/bloginfos")
     public Object getBlogsInfoList(
             @RequestParam(value = "type",required = true) @NotNull String type,
