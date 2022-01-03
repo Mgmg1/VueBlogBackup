@@ -2,6 +2,8 @@ package com.whz.blog.service.impl;
 
 import com.whz.blog.entity.Article;
 import com.whz.blog.entity.Tag;
+import com.whz.blog.exception.BusinessException;
+import com.whz.blog.exception.ResponseEnum;
 import com.whz.blog.mapper.ArticleMapper;
 import com.whz.blog.service.ArticleService;
 import com.whz.blog.service.TagService;
@@ -9,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
  * @Date 2021/2/10 21:20
  */
 @Service
+@Transactional
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
@@ -36,20 +36,12 @@ public class ArticleServiceImpl implements ArticleService {
         if(result!=1) {
             return false;
         }
-
-        if(tags.length !=0 ){
-            List<Tag> tagList = Arrays.stream(tags).map((tagName) -> {
-                Tag tag = new Tag();
-                tag.setTagName(tagName);
-                tag.setUserId(article.getUserId());
-                //articleId 被回写
-                tag.setArticleId(article.getArticleId());
-                return tag;
-            }).collect(Collectors.toList());
-            Integer tagNums = tagService.addTag(tagList);
-            if(tagNums==0 ){
-                return false;
-            }
+        if(tags != null && tags.length !=0 ){
+            tagService.addTag(tags);
+            List<Tag> tagList = tagService.queryByTagNames(tags);
+            if ( tagList.isEmpty() || tagList.size() != tags.length ) { throw new BusinessException(ResponseEnum.ERROR_EMPTY_RESULT,null,"此处不该为空");}
+            List<Integer> tagIds = tagList.stream().map(Tag::getTagId).collect(Collectors.toList());
+            return tagService.addArticleTagLink(article.getArticleId(), tagIds) != 0;
         }
 
         return true;
@@ -108,7 +100,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Integer deleteArticleByArticleId(int articleId,int userId) {
 
-        tagService.deleteTagsByArticleId(articleId ); //存在外键时，必须先删除外键关联的记录，再删除实体
+        tagService.deleteArticleTagLinkByArticleId(articleId ); //存在外键时，必须先删除外键关联的记录，再删除实体
         return articleMapper.deleteArticleByArticleId(articleId,userId);
         //当删除后返回的受影响的行数为0时，说明发生了未知的错误。
     }

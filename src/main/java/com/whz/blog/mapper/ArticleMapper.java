@@ -7,10 +7,6 @@ import java.util.Map;
 
 public interface ArticleMapper {
 
-    List<Article> selectByUserId(Integer userId);
-
-    Article selectByArticleId(Integer articleId);
-
     Integer addArticle(Article article);
 
     Article queryByArticleId(Integer articleId);

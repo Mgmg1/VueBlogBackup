@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @Date 2021/2/10 18:10
  */
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired

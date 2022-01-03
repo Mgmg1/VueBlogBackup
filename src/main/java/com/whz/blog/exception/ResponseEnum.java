@@ -12,7 +12,12 @@ public enum ResponseEnum implements BusinessExceptionAssert {
     /**
      * Licence not found
      */
-    LICENCE_NOT_FOUND(7002, "Licence not found.");
+    LICENCE_NOT_FOUND(7002, "Licence not found."),
+
+    /**
+     * error empty result
+     */
+    ERROR_EMPTY_RESULT( 7003,"error empty result" );
 
     /**
      * 返回码

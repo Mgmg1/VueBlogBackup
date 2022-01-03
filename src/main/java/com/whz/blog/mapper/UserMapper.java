@@ -3,11 +3,9 @@ package com.whz.blog.mapper;
 import com.whz.blog.entity.User;
 
 
-import java.util.List;
-
 public interface UserMapper {
 
-     Integer addUser(User user);
+    Integer addUser(User user);
 
      User queryByNameOrEmail(String nameOrEmail);
 

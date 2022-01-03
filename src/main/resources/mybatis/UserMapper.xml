@@ -37,7 +37,7 @@
             password,
             email,
             head_img_url,
-            announcement
+            announcement,
             github_url,
             bilibili_url
         from user

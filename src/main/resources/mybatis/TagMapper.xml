@@ -5,51 +5,55 @@
     <resultMap id="tagMapping" type="Tag">
         <id property="tagId" column="tag_id"/>
         <result property="tagName" column="tag_name"/>
-        <result property="articleId" column="article_id"/>
-        <result property="userId" column="user_id"/>
     </resultMap>
 
     <select id="queryTagInfos" resultType="HashMap">
-        select tag_name as tagName , COUNT(article_id) as tagCount
-        from tag
-        where user_id = #{userId}
-        group by tag_name
+        SELECT tag_name AS tagName ,COUNT(*) AS tagCount
+        FROM tag,article_tag,article
+        WHERE tag.tag_id = article_tag.tag_id AND article.article_id = article_tag.article_id AND article.user_id = #{userId}
+        GROUP BY tag_name
     </select>
 
-    <select id="queryByArticleId" resultMap="tagMapping" parameterType="int">
-        select
-            *
-        from tag
-        where
-            article_id = #{articleId}
+    <select id="queryByArticleId" resultType="HashMap" parameterType="int">
+        SELECT tag.tag_id AS tagId ,tag_name as tagName, article.article_id AS articleId ,article.user_id AS userId
+        FROM tag,article_tag,article
+        WHERE tag.tag_id = article_tag.tag_id AND article.article_id = article_tag.article_id AND article.article_id = #{articleId}
     </select>
 
-    <select id="queryByTagId" resultMap="tagMapping" parameterType="int">
-        select * from tag where tag_id = #{tagId}
-    </select>
 
-    <select id="querytByUserId" resultMap="tagMapping" parameterType="int">
-        select * from article where user_id = #{userId}
-    </select>
+    <insert id="addTag" >
+        INSERT INTO tag ( tag_name )
+        SELECT #{tagName} FROM DUAL
+        WHERE NOT EXISTS (
+                SELECT * FROM tag WHERE tag_name = #{tagName}
+            )
+    </insert>
 
-    <insert id="addTag" parameterType="list" >
-        insert into tag (
-            tag_name,
-            article_id,
-            user_id
-        )
-        <if test="list!=null and list.size!=0">
+    <delete id="deleteArticleTagLinkByArticleId" parameterType="int">
+        delete
+        from article_tag
+        where article_id = #{articleId};
+    </delete>
+
+    <insert id="addArticleTagLink" >
+        insert into article_tag( article_id,tag_id )
+        <if test="tagIds != null and tagIds.size!=0 ">
             values
-            <foreach collection="list" item="tag"  separator=",">
-                (#{tag.tagName},#{tag.articleId},#{tag.userId})
+            <foreach collection="tagIds" item="tagId" separator=",">
+                (#{articleId},#{tagId})
             </foreach>
         </if>
     </insert>
 
-    <delete id="deleteTagsByArticleId" parameterType="int">
-        delete
+<!--    parameterType="String[]" 数组时，基本类型和写 xxx[], 复杂类型(包括String)写  Object[] 或者不写-->
+    <select id="queryByTagNames"  resultMap="tagMapping">
+        select tag_id,tag_name
         from tag
-        where article_id = #{articleId};
-    </delete>
-
+        where tag_name in
+        <if test="array != null and array.length!=0 ">
+            <foreach collection="array" item="tagName" separator="," open="(" close=")">
+                #{tagName}
+            </foreach>
+        </if>
+    </select>
 </mapper>

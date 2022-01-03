@@ -16,6 +16,7 @@ import java.util.Map;
  * @Date 2021/2/12 11:02
  */
 @Service
+@Transactional
 public class TagServiceImpl implements TagService {
 
     @Autowired
@@ -27,19 +28,32 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Integer addTag(List<Tag> tagList) {
-        return tagMapper.addTag(tagList);
+    public Integer addTag(String[] tagNames) {
+        int result = 0;
+        for (int i = 0; i < tagNames.length; i++) {
+            result += tagMapper.addTag(tagNames[i]);
+        }
+        return result;
     }
 
     @Override
-    public List<Tag> queryTagsByArticleId(Integer articleId) {
+    public List<Map<String,Object>>queryTagsByArticleId(Integer articleId) {
         return tagMapper.queryByArticleId( articleId );
     }
 
     @Override
-    public Integer deleteTagsByArticleId(int articleId) {
-        return tagMapper.deleteTagsByArticleId( articleId );
+    public Integer deleteArticleTagLinkByArticleId(int articleId) {
+        return tagMapper.deleteArticleTagLinkByArticleId( articleId );
     }
 
+    @Override
+    public Integer addArticleTagLink(int articleId, List<Integer> tagIds) {
+        return tagMapper.addArticleTagLink(articleId, tagIds);
+    }
+
+    @Override
+    public List<Tag> queryByTagNames(String[] tagNames) {
+        return tagMapper.queryByTagNames( tagNames );
+    }
 
 }

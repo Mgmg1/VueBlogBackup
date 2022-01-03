@@ -9,9 +9,13 @@ public interface TagService {
 
     List<Map<String, Object>> queryTagInfos(Integer userId);
 
-    Integer addTag(List<Tag> tagList);
+    Integer addTag(String[] tagNames);
 
-    List<Tag> queryTagsByArticleId(Integer articleId);
+    List<Map<String,Object>> queryTagsByArticleId(Integer articleId);
 
-    Integer deleteTagsByArticleId(int articleId);
+    Integer deleteArticleTagLinkByArticleId(int articleId);
+
+    Integer addArticleTagLink( int articleId,List<Integer> tagIds );
+
+    List<Tag> queryByTagNames( String[] tagNames );
 }

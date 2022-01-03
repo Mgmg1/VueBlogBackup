@@ -42,4 +42,5 @@ public interface Assert {
             throw newException( args ) ;
         }
     }
+
 }

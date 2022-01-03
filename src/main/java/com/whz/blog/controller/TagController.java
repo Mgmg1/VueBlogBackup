@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class TagController {
@@ -27,7 +28,7 @@ public class TagController {
         result.setCode(200);
 
         try {
-            List<Tag> tagList = tagService.queryTagsByArticleId(articleId);
+            List<Map<String,Object>> tagList = tagService.queryTagsByArticleId(articleId);
             result.setData(tagList);
         } catch (Exception e) {
             e.printStackTrace();

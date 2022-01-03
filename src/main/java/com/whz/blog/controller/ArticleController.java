@@ -2,6 +2,7 @@ package com.whz.blog.controller;
 
 import com.whz.blog.entity.Article;
 import com.whz.blog.entity.Result;
+import com.whz.blog.entity.User;
 import com.whz.blog.interceptor.AccessLimit;
 import com.whz.blog.service.ArticleService;
 import com.whz.blog.util.JwtUtil;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -170,13 +172,12 @@ public class ArticleController {
                 return result;
             }
 
-
             String fileName = article.getTitle() + " " + article.getCreateDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString() + ".md";
             byte[] bytes = (byte[]) article.getContent();
             //向输出流写文件
             //写之前设置响应流以附件的形式打开返回值,这样可以保证前边打开文件出错时异常可以返回给前台
             outputStream = response.getOutputStream();
-            response.setHeader("Content-Disposition","attachment;filename="+fileName);
+            response.setHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(fileName, "UTF-8"));
             outputStream.write(bytes);
             outputStream.flush();
             outputStream.close();
@@ -200,14 +201,22 @@ public class ArticleController {
         根据articleId删除文章Id
         只能让拥有该article的用户删除
      */
+    @AccessLimit(needLogin = true)
     @PostMapping("/deletearticle")
     public Result deleteArticleByArticleId(
             @RequestParam(value = "aid",required = true) Integer articleId,
-            @RequestParam(value = "uid",required = true) Integer userId
+            @RequestParam(value = "uid",required = true) Integer userId,
+            HttpSession session
     ) {
         Result result = new Result();
         result.setCode( 500 );
         result.setMessage("发生了未知的错误");
+
+        User user = (User) session.getAttribute(UserController.USER);
+        if( user == null || !userId.equals( user.getUserId() ) ) {
+            //说明前端的删除流程没有正常地被执行，参数可能被篡改
+            return result;
+        }
 
         try {
             int integer = articleService.deleteArticleByArticleId(articleId,userId);

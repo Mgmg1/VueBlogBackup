@@ -16,7 +16,7 @@
 
     <select id="queryInfosByNoteType" resultMap="articleMapping" >
             select
-            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
+            article_id,user_id,cover_url,title,create_date,summary,category_name
             from article
             where
             user_id = #{userId} and note_type = #{noteType}
@@ -24,7 +24,7 @@
 
     <select id="queryInfosByCategoryName" resultMap="articleMapping" >
             select
-            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
+            article_id,user_id,cover_url,title,create_date,summary,category_name
             from article
             where
             user_id = #{userId} and category_name = #{categoryName}
@@ -33,14 +33,10 @@
 
     <select id="queryInfosByTagName" resultMap="articleMapping" parameterType="Tag">
             select
-            article_id,user_id,cover_url,title,create_date,summary,create_date,category_name
-            from article
-            where article_id in (
-                select
-                article_id
-                from tag
-                where user_id = #{userId} and tag_name = #{tagName}
-            )
+            article.article_id as article_id ,user_id,cover_url,title,create_date,summary,category_name
+            from article,article_tag,tag
+            where tag.tag_id = article_tag.tag_id AND article.article_id = article_tag.article_id AND user_id = #{userId} AND tag_name = #{tagName}
+
     </select>
 
 
